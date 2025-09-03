@@ -1,73 +1,165 @@
-@import "tailwindcss";
+/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-
+/* ---------------------------------------
+   THEME / SIZING (tweak as you like)
+   --------------------------------------- */
 :root {
-  --background: #db2626;
-  --foreground: #171717;
+  /* Solid frame thickness (scales with device) */
+  --pf-frame: clamp(10px, 3.6vmin, 26px);
+
+  /* Outward top notch diameter */
+  --pf-notch-size: clamp(100px, 9vmin, 80px);
+
+  /* Bottom shoulders size (intrude into screen) */
+  --pf-shoulder-width: clamp(26px, 6.5vmin, 52px);
+  --pf-shoulder-height: clamp(300px, 22vmin, 180px);
+  --pf-shoulder-radius: 1px;
+
+  /* Keep content clear of the shoulders (extra inner padding) */
+  --pf-shoulder-clear-x: calc(var(--pf-shoulder-width) + 10px);
+
+  /* Content comfort padding INSIDE the screen */
+  --pf-screen-pad: clamp(10px, 2.8vmin, 22px);
+
+  /* Color */
+  --pf-red: #bb0410; /* bright solid red */
+  --background: #000000;
+  --foreground: #e5e7eb;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-poke);
+/* Normalize */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html, body { background: var(--background); color: var(--foreground); }
+
+/* Robust viewport height for mobile (small/ dynamic) */
+.h-screen-fix { height: 100dvh; height: 100svh; }
+
+/* ---------------------------------------
+   FRAME: SOLID BORDERS + NOTCH + SHOULDERS
+   --------------------------------------- */
+.pf-root { position: relative; }
+
+/* Four solid borders that exactly hug the window */
+.pf-frame {
+  position: fixed;
+  background: var(--pf-red);
+  z-index: 40;
+  pointer-events: none;
+}
+.pf-top    { top: 0;    left: 0; width: 100vw; height: var(--pf-frame); }
+.pf-bottom { bottom: 0; left: 0; width: 100vw; height: var(--pf-frame); }
+.pf-left   { left: 0;   top:  0; width: var(--pf-frame); height: 100svh; }
+.pf-right  { right: 0;  top:  0; width: var(--pf-frame); height: 100svh; }
+
+/* Outward circular notch socket (hollow ring) */
+.pf-notch {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  width: var(--pf-notch-size);
+  height: var(--pf-notch-size);
+  transform: translate(-50%, -50%);     /* centered on the top edge; sits outside */
+  border: var(--pf-frame) solid var(--pf-red);
+  border-radius: 9999px;
+  background: transparent;
+  z-index: 45;
+  pointer-events: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #d11f1f;
-    --foreground: #ededed;
-  }
+/* Optional notch content slot (Pokéball icon, etc.) */
+.pf-notch-slot {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  width: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
+  height: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
+  transform: translate(-50%, calc(-50% + var(--pf-frame)));
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  z-index: 46;
+  pointer-events: auto; /* allow icon interactions */
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+
+
+.pf-notch-img {
+  width : 100%;
+  height : 100%;
+  object-fit: contain;
+  display: block;
+
 }
 
-
-
-
-/* === 8-bit / pixel look helpers === */
-@layer utilities {
-  /* Hard 1–2px outline (inside + outside), like old sprite borders */
-  .pixel-border { box-shadow: inset 0 0 0 2px rgba(0,0,0,.65), 0 0 0 2px rgba(0,0,0,.65); }
-
-  /* Blocky drop shadow (no blur) */
-  .shadow-pixel { box-shadow: 0 4px 0 rgba(0,0,0,.35), 0 8px 0 rgba(0,0,0,.18); }
-
-  /* Square “notched” corners (8-bit vibe). Adjust --p to taste (grid unit). */
-  .pixel-corners {
-    --p: 10px; /* notch size */
-    clip-path:
-      polygon(0% var(--p), var(--p) var(--p), var(--p) 0,
-              calc(100% - var(--p)) 0, calc(100% - var(--p)) var(--p), 100% var(--p),
-              100% calc(100% - var(--p)), calc(100% - var(--p)) calc(100% - var(--p)),
-              calc(100% - var(--p)) 100%, var(--p) 100%, var(--p) calc(100% - var(--p)),
-              0% calc(100% - var(--p)));
-  }
-
-  /* Top-only “stepped” edge (staircase diagonal like NES UI). */
-  .pixel-top-step {
-    --u: 8px; /* grid unit; keep everything in multiples of this */
-    /* draws: straight top → drop in steps on the right → straight back */
-    clip-path: polygon(
-      0 0, 100% 0,
-      100% calc(6*var(--u)),
-      calc(100% - 4*var(--u)) calc(6*var(--u)),
-      calc(100% - 4*var(--u)) calc(7*var(--u)),
-      0 calc(7*var(--u))
-    );
-  }
-
-  /* Tiny horizontal “speaker slit” line (re-usable) */
-  .pixel-slit { height: 6px; border: 2px solid rgba(0,0,0,.7); background:#161616; }
-
-  /* Make edges look crisp (turn off subpixel smoothing for the frame text if you want) */
-  .pixel-text { -webkit-font-smoothing: none; -moz-osx-font-smoothing: auto; letter-spacing: .01em; }
+/* Bottom shoulders (solid red) that intrude and merge into the bottom bar */
+.pf-shoulder {
+  position: fixed;
+  bottom: 0;                                /* visually merges into the bottom frame */
+  width: var(--pf-shoulder-width);
+  height: calc(var(--pf-shoulder-height) + var(--pf-frame));
+  background: var(--pf-red);
+  z-index: 41;                               /* above screen, under notch */
+  pointer-events: none;
+  border-top-left-radius: var(--pf-shoulder-radius);
+  border-top-right-radius: var(--pf-shoulder-radius);
 }
+.pf-shoulder-left  { left: var(--pf-frame); }
+.pf-shoulder-right { right: var(--pf-frame); }
+
+/* ---------------------------------------
+   CONTENT: ALWAYS INSIDE, SCALES WITH DEVICE
+   --------------------------------------- */
+/* Adds padding so content never hides under frame or shoulders.
+   Also respects safe areas (iPhone notch/home-bar). */
+.pf-content {
+  position: relative;
+  z-index: 20;
+  height: 100%;
+  box-sizing: border-box;
+
+  padding-top: calc(var(--pf-frame) + env(safe-area-inset-top));
+  padding-right: calc(var(--pf-frame) + env(safe-area-inset-right));
+  padding-bottom: calc(var(--pf-frame) + env(safe-area-inset-bottom));
+  padding-left: calc(var(--pf-frame) + env(safe-area-inset-left));
+
+  /* Keep the "screen" from spilling under overlays */
+  overflow: hidden;
+}
+
+/* The actual screen pane (only this scrolls) */
+.pf-screen {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  border-radius: 10px;
+  background: #0a0a0a;
+  border: 1px solid rgba(255,255,255,0.12);
+
+  /* Make typography and UI scale with device size */
+  font-size: clamp(22px, 1.9vmin, 18px);
+  line-height: 1.45;
+}
+
+/* Inner padding that ALSO clears the shoulders horizontally */
+.pf-screen-inner {
+  padding-top: var(--pf-screen-pad);
+  padding-bottom: var(--pf-screen-pad);
+  padding-left: calc(var(--pf-screen-pad) + var(--pf-shoulder-clear-x));
+  padding-right: calc(var(--pf-screen-pad) + var(--pf-shoulder-clear-x));
+}
+
+/* Media: keep images/videos responsive inside screen */
+.pf-screen img,
+.pf-screen video,
+.pf-screen canvas,
+.pf-screen svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
