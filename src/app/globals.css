@@ -1,49 +1,77 @@
-/* Tailwind */
+/* src/app/globals.css */
+
+/* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ---------------------------------------
-   THEME / SIZING (tweak as you like)
+   THEME / SIZING (responsive)
    --------------------------------------- */
 :root {
-  /* Solid frame thickness (scales with device) */
+  /* bezel / notch scale */
   --pf-frame: clamp(10px, 3.6vmin, 26px);
+  --pf-notch-size: clamp(52px, 8.5vmin, 96px);
 
-  /* Outward top notch diameter */
-  --pf-notch-size: clamp(100px, 9vmin, 80px);
-
-  /* Bottom shoulders size (intrude into screen) */
+  /* bottom shoulders */
   --pf-shoulder-width: clamp(26px, 6.5vmin, 52px);
-  --pf-shoulder-height: clamp(300px, 22vmin, 180px);
-  --pf-shoulder-radius: 1px;
+  --pf-shoulder-height: clamp(80px, 22vmin, 300px);
+  --pf-shoulder-radius: 6px;
 
-  /* Keep content clear of the shoulders (extra inner padding) */
+  /* padding to clear shoulders; interior spacing */
   --pf-shoulder-clear-x: calc(var(--pf-shoulder-width) + 10px);
-
-  /* Content comfort padding INSIDE the screen */
   --pf-screen-pad: clamp(10px, 2.8vmin, 22px);
 
-  /* Color */
-  --pf-red: #bb0410; /* bright solid red */
-  --background: #000000;
+  /* brand + default colors */
+  --pf-red: #bb0410;
+  --background: #272727;
   --foreground: #e5e7eb;
 }
 
-/* Normalize */
+/* narrow phones: slightly smaller frame/notch */
+@media (max-width: 480px) {
+  :root {
+    --pf-frame: clamp(8px, 3.4vmin, 18px);
+    --pf-notch-size: clamp(60px, 10vmin, 72px);
+  }
+}
+
+/* laptops/desktops: scale up bezel/notch a touch */
+@media (min-width: 1024px) {
+  :root {
+    --pf-frame: clamp(12px, 1.6vmin, 28px);
+    --pf-notch-size: clamp(70px, 5vmin, 128px);
+  }
+}
+
+/* very large displays: prevent tiny-looking notch */
+@media (min-width: 1440px) {
+  :root {
+    --pf-notch-size: clamp(75px, 4.5vmin, 144px);
+  }
+}
+
+/* base font scaling for the “screen” area */
+.pf-screen { font-size: clamp(16px, 2.0vmin, 20px); }
+
+/* normalize */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html, body { background: var(--background); color: var(--foreground); }
 
-/* Robust viewport height for mobile (small/ dynamic) */
+/* robust mobile viewport height */
 .h-screen-fix { height: 100dvh; height: 100svh; }
 
+/* utilities */
+@layer utilities {
+  .pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
+}
+
 /* ---------------------------------------
-   FRAME: SOLID BORDERS + NOTCH + SHOULDERS
+   FRAME: solid borders + shoulders
    --------------------------------------- */
 .pf-root { position: relative; }
 
-/* Four solid borders that exactly hug the window */
 .pf-frame {
   position: fixed;
   background: var(--pf-red);
@@ -55,55 +83,13 @@ html, body { background: var(--background); color: var(--foreground); }
 .pf-left   { left: 0;   top:  0; width: var(--pf-frame); height: 100svh; }
 .pf-right  { right: 0;  top:  0; width: var(--pf-frame); height: 100svh; }
 
-/* Outward circular notch socket (hollow ring) */
-.pf-notch {
-  position: fixed;
-  left: 50%;
-  top: 0;
-  width: var(--pf-notch-size);
-  height: var(--pf-notch-size);
-  transform: translate(-50%, -50%);     /* centered on the top edge; sits outside */
-  border: var(--pf-frame) solid var(--pf-red);
-  border-radius: 9999px;
-  background: transparent;
-  z-index: 45;
-  pointer-events: none;
-}
-
-/* Optional notch content slot (Pokéball icon, etc.) */
-.pf-notch-slot {
-  position: fixed;
-  left: 50%;
-  top: 0;
-  width: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
-  height: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
-  transform: translate(-50%, calc(-50% + var(--pf-frame)));
-  display: grid;
-  place-items: center;
-  border-radius: 9999px;
-  z-index: 46;
-  pointer-events: auto; /* allow icon interactions */
-}
-
-
-
-
-.pf-notch-img {
-  width : 100%;
-  height : 100%;
-  object-fit: contain;
-  display: block;
-
-}
-
-/* Bottom shoulders (solid red) that intrude and merge into the bottom bar */
 .pf-shoulder {
   position: fixed;
-  bottom: 0;                                /* visually merges into the bottom frame */
+  bottom: 0;
   width: var(--pf-shoulder-width);
   height: calc(var(--pf-shoulder-height) + var(--pf-frame));
   background: var(--pf-red);
-  z-index: 41;                               /* above screen, under notch */
+  z-index: 41;
   pointer-events: none;
   border-top-left-radius: var(--pf-shoulder-radius);
   border-top-right-radius: var(--pf-shoulder-radius);
@@ -112,10 +98,55 @@ html, body { background: var(--background); color: var(--foreground); }
 .pf-shoulder-right { right: var(--pf-frame); }
 
 /* ---------------------------------------
-   CONTENT: ALWAYS INSIDE, SCALES WITH DEVICE
+   NOTCH: ring + slot (image goes in slot)
    --------------------------------------- */
-/* Adds padding so content never hides under frame or shoulders.
-   Also respects safe areas (iPhone notch/home-bar). */
+.pf-notch {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  width: var(--pf-notch-size);
+  height: var(--pf-notch-size);
+  transform: translate(-50%, -50%);
+  border: var(--pf-frame) solid var(--pf-red);
+  border-radius: 9999px;
+  background: transparent;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+/* slot behind the notch image (fills transparent pixels) */
+.pf-notch-slot {
+  position: fixed;
+  left: 50%;
+  top: 0;
+  width: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
+  height: calc(var(--pf-notch-size) - 2 * var(--pf-frame));
+  transform: translate(-50%, calc(-50% + var(--pf-frame))) translateZ(0);
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: var(--pf-red);
+  z-index: 1002;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+/* notch image sizing */
+.pf-notch-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* keep any top strips below the notch */
+.pf-top, .top-strip, .status-strip { z-index: 900; }
+
+/* ---------------------------------------
+   CONTENT: inside the frame, safe-area padded
+   --------------------------------------- */
 .pf-content {
   position: relative;
   z-index: 20;
@@ -127,25 +158,32 @@ html, body { background: var(--background); color: var(--foreground); }
   padding-bottom: calc(var(--pf-frame) + env(safe-area-inset-bottom));
   padding-left: calc(var(--pf-frame) + env(safe-area-inset-left));
 
-  /* Keep the "screen" from spilling under overlays */
-  overflow: hidden;
+  overflow: hidden; /* prevent spill under overlays */
 }
 
-/* The actual screen pane (only this scrolls) */
+/* ---------------------------------------
+   SCREEN: transparent pane that scrolls
+   --------------------------------------- */
 .pf-screen {
   height: 100%;
   width: 100%;
   overflow: auto;
   border-radius: 10px;
-  background: #0a0a0a;
-  border: 1px solid rgba(255,255,255,0.12);
 
-  /* Make typography and UI scale with device size */
-  font-size: clamp(22px, 1.9vmin, 18px);
+  background: transparent;  /* remove black box */
+  border: none;             /* remove bezel */
+
+  font-size: clamp(16px, 2.0vmin, 20px);
   line-height: 1.45;
+
+  scrollbar-gutter: stable both-edges;
+
+  /* Firefox scrollbar colors */
+  scrollbar-width: thin;
+  scrollbar-color: var(--pf-red) transparent;
 }
 
-/* Inner padding that ALSO clears the shoulders horizontally */
+/* inner padding that clears bottom shoulders */
 .pf-screen-inner {
   padding-top: var(--pf-screen-pad);
   padding-bottom: var(--pf-screen-pad);
@@ -153,7 +191,7 @@ html, body { background: var(--background); color: var(--foreground); }
   padding-right: calc(var(--pf-screen-pad) + var(--pf-shoulder-clear-x));
 }
 
-/* Media: keep images/videos responsive inside screen */
+/* responsive media inside the screen */
 .pf-screen img,
 .pf-screen video,
 .pf-screen canvas,
@@ -163,3 +201,21 @@ html, body { background: var(--background); color: var(--foreground); }
   display: block;
 }
 
+/* Chrome/Safari scrollbar tweaks scoped to screen */
+.pf-screen::-webkit-scrollbar { width: 12px; height: 12px; }
+.pf-screen::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.pf-screen::-webkit-scrollbar-thumb {
+  background: var(--pf-red);
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+.pf-screen::-webkit-scrollbar-thumb:hover { background: #d10a18; }
+
+/* keep outlines off inside the screen without killing borders/rings globally */
+.pf-screen *, .pf-screen *::before, .pf-screen *::after {
+  outline: 0 !important;
+}

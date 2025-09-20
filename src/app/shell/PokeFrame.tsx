@@ -34,10 +34,10 @@ export default function PokeFrame({ children, notch, className = "" }: PokeFrame
       <div className="pf-shoulder pf-shoulder-left" aria-hidden />
       <div className="pf-shoulder pf-shoulder-right" aria-hidden />
 
-      {/* Content wrapper: keep everything inside the frame/shoulders; only inner screen scrolls */}
+      {/* Content wrapper: keep everything inside the frame/shoulders , only inner screen scrolls */}
       <div className="pf-content">
         <div className="pf-screen">
-          {/* Tip: put your page padding INSIDE here, not on body/html */}
+          
           <div className="pf-screen-inner">
             {children}
           </div>

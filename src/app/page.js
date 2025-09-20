@@ -1,6 +1,5 @@
 
-
-
+//redirect to pokemon/page
 import { redirect } from "next/navigation";
 
 
