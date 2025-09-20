@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Pokédex + Camera Scanner (Next.js 15)
 
-## Getting Started
+A phone-styled Pokédex built with Next.js 15 (App Router), styled with CSS variables/Tailwind, backed by PokeAPI, and supercharged with a camera scanner that identifies Pokémon using TensorFlow.js (MobileNet embeddings + KNN classifier). Supports Google Sign-In via Auth.js (NextAuth).
 
-First, run the development server:
+Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Pokédex list with responsive, centered grid and smooth hover
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Detail pages at /Pokemon/[id] (background blends with the Pokémon’s type)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Camera Scanner at /scan
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build/clear a local KNN index (Gen 1 by default)
 
-## Learn More
+Identify from camera or imported image
 
-To learn more about Next.js, take a look at the following resources:
+Tunables: k (neighbors) and decision threshold
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Type-aware hover colors on tiles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Sprite size independent from other tile elements (--sprite-size)
 
-## Deploy on Vercel
+Google Auth (Auth.js / NextAuth) ready
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Production-grade tweaks for mobile performance
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Stack
+
+Frontend: Next.js 15 (App Router), React 19, Tailwind/CSS variables
+
+Data: PokeAPI
+
+ML: TensorFlow.js (MobileNet v2) + @tensorflow-models/knn-classifier
+
+Auth: Auth.js (NextAuth)
