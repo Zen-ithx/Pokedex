@@ -124,3 +124,4 @@ My friend Max for beating me at Pokemon Showdown all the time.
 ## Note:
 
 Further improvements in UI,QOL and accessibility on the way soon :)
+Also have to work on optimisation through rendering styles.
